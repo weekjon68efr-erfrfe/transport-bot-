@@ -19,11 +19,9 @@ class Messages:
     
     @staticmethod
     def registration_name_success(name: str) -> str:
-        return f"""
-    ФИО: {name}
+        return f"""ФИО: {name}
 
-    Теперь введите ваш личный номер телефона:
-    """
+    Теперь введите ваш личный номер телефона:"""
     
     @staticmethod
     def registration_phone_success() -> str:
@@ -31,8 +29,7 @@ class Messages:
     
     @staticmethod
     def registration_complete(name: str, phone: str, truck: str) -> str:
-        return f"""
-    *Регистрация завершена!*
+        return f"""*Регистрация завершена!*
 
     *Ваши данные:*
     ФИО: {name}
@@ -40,31 +37,25 @@ class Messages:
     Машина: {truck}
 
     Отправьте *1* для заполнения нового груза
-    Отправьте *0* для главного меню
-    """
+    Отправьте *0* для главного меню"""
     
     # Menu messages
     @staticmethod
     def main_menu_unregistered() -> str:
-        return """
-    Вы не зарегистрированы в системе.
+        return """Вы не зарегистрированы в системе.
 
-    Отправьте *да* для регистрации
-    """
+    Отправьте *да* для регистрации"""
     
     @staticmethod
     def main_menu_registered(name: str, truck: str) -> str:
-        return f"""
-    Здравствуйте, {name}!
+        return f"""Здравствуйте, {name}!
     Ваша машина: {truck}
 
     *Выберите действие:*
-
     1 - Новый отчет о взвешивании
     2 - Изменить номер машины
     3 - Переоформить регистрацию
-    0 - Главное меню
-    """
+    0 - Главное меню"""
     
     # Report messages
     @staticmethod
@@ -77,11 +68,7 @@ class Messages:
     
     @staticmethod
     def enter_photo() -> str:
-        return """
-    Теперь отправьте фотографию показаний весов для подтверждения
-
-    Или напишите *пропустить* если фото нет
-    """
+        return """Отправьте фотографию показаний весов для подтверждения"""
     
     @staticmethod
     def invalid_number() -> str:
@@ -94,8 +81,7 @@ class Messages:
     @staticmethod
     def confirmation_report(data: Dict[str, Any]) -> str:
         """Format confirmation report"""
-        return f"""
-    *Подтверждение отчета*
+        return f"""*Подтверждение отчета*
 
     Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
     Телефон: {data.get('driver_phone', '?')}
@@ -107,26 +93,21 @@ class Messages:
     Разница: {data.get('weight_difference', 0):+.0f} кг
 
     Напишите *да* для сохранения
-    Напишите *нет* для отмены
-    """
+    Напишите *нет* для отмены"""
     
     @staticmethod
     def report_saved() -> str:
-        return """
-    *Отчет сохранен и отправлен!*
+        return """*Отчет сохранен и отправлен!*
 
     Отправьте *1* для заполнения нового груза
-    Отправьте *0* для главного меню
-    """
+    Отправьте *0* для главного меню"""
     
     @staticmethod
     def report_cancelled() -> str:
-        return """
-    Отчет отменен.
+        return """Отчет отменен.
 
     Отправьте *1* для нового отчета
-    Отправьте *0* для главного меню
-    """
+    Отправьте *0* для главного меню"""
     
     @staticmethod
     def truck_updated(truck: str) -> str:
