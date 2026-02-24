@@ -245,13 +245,13 @@ class BotHandlers:
         
         if not photo_url:
             logger.error(f"No photo URL in media data: {media_data}")
-            return "❌ Не удалось получить фото. Попробуйте еще раз."
+            return "Не удалось получить фото. Попробуйте еще раз."
         
         # Download photo
         success, filepath, error = self.photo_service.download_photo(photo_url, phone)
         
         if not success:
-            return f"❌ {error}"
+            return f"{error}"
         
         # Update temp data
         temp_data['photo_received'] = True
@@ -296,7 +296,7 @@ class BotHandlers:
             self.db.clear_user_state(phone)
             return Messages.report_saved()
         else:
-            return "❌ Ошибка при сохранении отчета. Попробуйте еще раз."
+            return "Ошибка при сохранении отчета. Попробуйте еще раз."
     
     def handle_change_truck(self, phone: str, text: str, temp_data: Dict) -> str:
         """Handle truck number change"""
@@ -339,15 +339,18 @@ class BotHandlers:
             logger.warning("GROUP_ID not configured, report not sent")
             return
         
-        report_text = f"""*{temp_data.get('driver_name', '')}*  *{temp_data.get('driver_phone', '')}*
+        driver_name = temp_data.get('driver_name', '') or ''
+        driver_phone = temp_data.get('driver_phone', '') or ''
 
-📅 Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
-🚛 Машина: {temp_data.get('truck_number', '')}
-👤 Клиент: {temp_data.get('client_name', '')}
+        report_text = f"""*{driver_name.upper()}*  {driver_phone}
 
-⚖️ Вес новый: {temp_data.get('current_weight', 0):.0f} кг
-⚖️ Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
-📊 Разница: {temp_data.get('weight_difference', 0):+.0f} кг"""
+    Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+    Машина: {temp_data.get('truck_number', '')}
+    Клиент: {temp_data.get('client_name', '')}
+
+    Вес новый: {temp_data.get('current_weight', 0):.0f} кг
+    Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
+    Разница: {temp_data.get('weight_difference', 0):+.0f} кг"""
         
         photo_url = temp_data.get('photo_url')
         photo_name = None
