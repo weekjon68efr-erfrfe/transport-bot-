@@ -6,6 +6,13 @@ from datetime import datetime
 import textwrap
 
 from bot.states import UserState, MenuCommands, UserSession
+"""
+Message handlers for bot logic
+"""
+from typing import Optional, Dict, Any
+from datetime import datetime
+
+from bot.states import UserState, MenuCommands, UserSession
 from bot.messages import Messages
 from bot.validators import Validators
 from services.database import Database
@@ -67,11 +74,8 @@ class BotHandlers:
                     state = UserState[state_name]
                     temp_data = state_data.get('temp_data', {})
                     
-                    # Special handling for photo state and allow sending photo instead of weight
+                    # Special handling for photo state
                     if state == UserState.AWAITING_PHOTO and has_media:
-                        return self.handle_photo_received(phone, temp_data, media_data)
-                    if state == UserState.AWAITING_WEIGHT and has_media:
-                        # Accept photo in place of weight: try to extract weight from photo
                         return self.handle_photo_received(phone, temp_data, media_data)
                     
                     # Get handler for current state
@@ -261,31 +265,10 @@ class BotHandlers:
         temp_data['photo_received'] = True
         temp_data['photo_path'] = filepath
         temp_data['photo_url'] = photo_url
-
-        # Try to extract weight from photo (OCR). If found, fill current weight and proceed to confirmation.
-        try:
-            extracted = None
-            try:
-                extracted = self.photo_service.recognize_weight(filepath)
-            except Exception:
-                extracted = None
-
-            if extracted is not None:
-                # Put extracted weight into temp_data
-                temp_data['current_weight'] = float(extracted)
-                temp_data['weight_difference'] = temp_data['current_weight'] - temp_data.get('previous_weight', 0)
-                self.db.set_user_state(phone, UserState.AWAITING_CONFIRMATION.name, temp_data)
-                return Messages.confirmation_report(temp_data)
-            else:
-                # OCR failed — fall back to asking user for weight (or confirmation)
-                self.db.set_user_state(phone, UserState.AWAITING_CONFIRMATION.name, temp_data)
-                # Also prompt user to enter weight if OCR failed
-                return Messages.confirmation_report(temp_data) + "\n\nНе удалось автоматически распознать вес. Пришлите, пожалуйста, вес вручную или подтвердите отчёт."
-
-        except Exception as e:
-            logger.error(f"Error processing OCR for photo: {e}")
-            self.db.set_user_state(phone, UserState.AWAITING_CONFIRMATION.name, temp_data)
-            return Messages.confirmation_report(temp_data)
+        
+        self.db.set_user_state(phone, UserState.AWAITING_CONFIRMATION.name, temp_data)
+        
+        return Messages.confirmation_report(temp_data)
     
     def handle_confirmation(self, phone: str, text: str, temp_data: Dict) -> str:
         """Handle report confirmation"""
@@ -367,17 +350,15 @@ class BotHandlers:
         driver_name = temp_data.get('driver_name', '') or ''
         driver_phone = temp_data.get('driver_phone', '') or ''
 
-        report_text = textwrap.dedent(f"""\
-        *{driver_name.upper()}*  {driver_phone}
+        report_text = f"""*{driver_name.upper()}*  {driver_phone}
 
-        Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
-        Машина: {temp_data.get('truck_number', '')}
-        Клиент: {temp_data.get('client_name', '')}
+    Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+    Машина: {temp_data.get('truck_number', '')}
+    Клиент: {temp_data.get('client_name', '')}
 
-        Вес новый: {temp_data.get('current_weight', 0):.0f} кг
-        Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
-        Разница: {temp_data.get('weight_difference', 0):+.0f} кг
-        """).strip()
+    Вес новый: {temp_data.get('current_weight', 0):.0f} кг
+    Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
+    Разница: {temp_data.get('weight_difference', 0):+.0f} кг"""
         
         photo_url = temp_data.get('photo_url')
         photo_name = None
