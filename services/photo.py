@@ -8,6 +8,17 @@ from typing import Optional, Tuple
 import requests
 from PIL import Image
 import io
+import re
+import numpy as np
+
+try:
+    import cv2
+    import pytesseract
+    _OCR_AVAILABLE = True
+except Exception:
+    cv2 = None
+    pytesseract = None
+    _OCR_AVAILABLE = False
 
 from config import Config
 from utils.logger import logger
@@ -101,3 +112,59 @@ class PhotoService:
                 
         except Exception as e:
             logger.error(f"Failed to cleanup photos: {e}")
+
+    @staticmethod
+    def recognize_weight(filepath: str) -> Optional[float]:
+        """Try to extract numeric weight from photo using OCR.
+        Returns weight as float or None if not found/available.
+        """
+        if not _OCR_AVAILABLE:
+            logger.debug("OCR libraries not available (pytesseract/opencv)")
+            return None
+
+        try:
+            # Read image with OpenCV
+            img = cv2.imdecode(np.fromfile(filepath, dtype=np.uint8), cv2.IMREAD_COLOR)
+            if img is None:
+                logger.debug("Failed to load image for OCR")
+                return None
+
+            # Convert to grayscale
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+            # Resize to improve OCR accuracy
+            h, w = gray.shape
+            scale = max(1, int(1000 / max(w, h)))
+            if scale > 1:
+                gray = cv2.resize(gray, (w * scale, h * scale), interpolation=cv2.INTER_CUBIC)
+
+            # Apply adaptive threshold to increase contrast
+            gray = cv2.medianBlur(gray, 3)
+            thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                           cv2.THRESH_BINARY, 31, 10)
+
+            # Use pytesseract to read digits and separators only
+            custom_oem_psm_config = r"--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789,.'"
+            text = pytesseract.image_to_string(thresh, config=custom_oem_psm_config)
+
+            if not text:
+                return None
+
+            # Find the largest numeric value in the OCR output
+            matches = re.findall(r"\d+[\.,]?\d*", text)
+            if not matches:
+                return None
+
+            # Choose the longest match (likely the weight) and parse
+            best = max(matches, key=lambda s: len(s))
+            weight_str = best.replace(',', '.').replace("'", '.')
+            try:
+                weight = float(weight_str)
+                logger.info(f"OCR extracted weight: {weight} from {filepath}")
+                return weight
+            except ValueError:
+                return None
+
+        except Exception as e:
+            logger.error(f"OCR failed: {e}")
+            return None
