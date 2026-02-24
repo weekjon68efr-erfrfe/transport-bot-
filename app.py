@@ -3,6 +3,7 @@ Main Flask application for WhatsApp bot
 """
 from flask import Flask, request, jsonify
 from datetime import datetime
+import os
 
 from config import Config, ConfigError
 from bot.handlers import BotHandlers
