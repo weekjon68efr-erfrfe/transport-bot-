@@ -3,25 +3,28 @@ Message templates for user responses
 """
 from datetime import datetime
 from typing import Optional, Dict, Any
+import textwrap
 
 
 class Messages:
     """All message templates"""
     
     # Registration messages
-    REGISTRATION_START = """
-*Регистрация водителя*
+    REGISTRATION_START = textwrap.dedent("""
+    *Регистрация водителя*
 
-Добро пожаловать! Для начала работы нужно зарегистрироваться.
+    Добро пожаловать! Для начала работы нужно зарегистрироваться.
 
-Введите ваше ФИО (полное имя):
-"""
+    Введите ваше ФИО (полное имя):
+    """).strip()
     
     @staticmethod
     def registration_name_success(name: str) -> str:
-        return f"""ФИО: {name}
+        return textwrap.dedent(f"""\
+        ФИО: {name}
 
-    Теперь введите ваш личный номер телефона:"""
+        Теперь введите ваш личный номер телефона:
+        """).strip()
     
     @staticmethod
     def registration_phone_success() -> str:
@@ -29,33 +32,39 @@ class Messages:
     
     @staticmethod
     def registration_complete(name: str, phone: str, truck: str) -> str:
-        return f"""*Регистрация завершена!*
+        return textwrap.dedent(f"""\
+        *Регистрация завершена!*
 
-    *Ваши данные:*
-    ФИО: {name}
-    Телефон: +{phone}
-    Машина: {truck}
+        *Ваши данные:*
+        ФИО: {name}
+        Телефон: +{phone}
+        Машина: {truck}
 
-    Отправьте *1* для заполнения нового груза
-    Отправьте *0* для главного меню"""
+        Отправьте *1* для заполнения нового груза
+        Отправьте *0* для главного меню
+        """).strip()
     
     # Menu messages
     @staticmethod
     def main_menu_unregistered() -> str:
-        return """Вы не зарегистрированы в системе.
+        return textwrap.dedent("""
+        Вы не зарегистрированы в системе.
 
-    Отправьте *да* для регистрации"""
+        Отправьте *да* для регистрации
+        """).strip()
     
     @staticmethod
     def main_menu_registered(name: str, truck: str) -> str:
-        return f"""Здравствуйте, {name}!
-    Ваша машина: {truck}
+        return textwrap.dedent(f"""\
+        Здравствуйте, {name}!
+        Ваша машина: {truck}
 
-    *Выберите действие:*
-    1 - Новый отчет о взвешивании
-    2 - Изменить номер машины
-    3 - Переоформить регистрацию
-    0 - Главное меню"""
+        *Выберите действие:*
+        1 - Новый отчет о взвешивании
+        2 - Изменить номер машины
+        3 - Переоформить регистрацию
+        0 - Главное меню
+        """).strip()
     
     # Report messages
     @staticmethod
@@ -81,33 +90,39 @@ class Messages:
     @staticmethod
     def confirmation_report(data: Dict[str, Any]) -> str:
         """Format confirmation report"""
-        return f"""*Подтверждение отчета*
+        return textwrap.dedent(f"""\
+        *Подтверждение отчета*
 
-    Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
-    Телефон: {data.get('driver_phone', '?')}
-    Машина: {data.get('truck_number', '?')}
-    Клиент: {data.get('client_name', '?')}
+        Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+        Телефон: {data.get('driver_phone', '?')}
+        Машина: {data.get('truck_number', '?')}
+        Клиент: {data.get('client_name', '?')}
 
-    Вес новый: {data.get('current_weight', 0):.0f} кг
-    Вес предыдущий: {data.get('previous_weight', 0):.0f} кг
-    Разница: {data.get('weight_difference', 0):+.0f} кг
+        Вес новый: {data.get('current_weight', 0):.0f} кг
+        Вес предыдущий: {data.get('previous_weight', 0):.0f} кг
+        Разница: {data.get('weight_difference', 0):+.0f} кг
 
-    Напишите *да* для сохранения
-    Напишите *нет* для отмены"""
+        Напишите *да* для сохранения
+        Напишите *нет* для отмены
+        """).strip()
     
     @staticmethod
     def report_saved() -> str:
-        return """*Отчет сохранен и отправлен!*
+        return textwrap.dedent("""
+        *Отчет сохранен и отправлен!*
 
-    Отправьте *1* для заполнения нового груза
-    Отправьте *0* для главного меню"""
+        Отправьте *1* для заполнения нового груза
+        Отправьте *0* для главного меню
+        """).strip()
     
     @staticmethod
     def report_cancelled() -> str:
-        return """Отчет отменен.
+        return textwrap.dedent("""
+        Отчет отменен.
 
-    Отправьте *1* для нового отчета
-    Отправьте *0* для главного меню"""
+        Отправьте *1* для нового отчета
+        Отправьте *0* для главного меню
+        """).strip()
     
     @staticmethod
     def truck_updated(truck: str) -> str:
