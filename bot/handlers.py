@@ -1,16 +1,7 @@
-"""
-Message handlers for bot logic
-"""
+"""Message handlers for bot logic"""
 from typing import Optional, Dict, Any
 from datetime import datetime
 import textwrap
-
-from bot.states import UserState, MenuCommands, UserSession
-"""
-Message handlers for bot logic
-"""
-from typing import Optional, Dict, Any
-from datetime import datetime
 
 from bot.states import UserState, MenuCommands, UserSession
 from bot.messages import Messages
@@ -350,15 +341,17 @@ class BotHandlers:
         driver_name = temp_data.get('driver_name', '') or ''
         driver_phone = temp_data.get('driver_phone', '') or ''
 
-        report_text = f"""*{driver_name.upper()}*  {driver_phone}
+        report_text = textwrap.dedent(f"""
+        *{driver_name.upper()}*  {driver_phone}
 
-    Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
-    Машина: {temp_data.get('truck_number', '')}
-    Клиент: {temp_data.get('client_name', '')}
+        Дата: {datetime.now().strftime('%d.%m.%Y %H:%M')}
+        Машина: {temp_data.get('truck_number', '')}
+        Клиент: {temp_data.get('client_name', '')}
 
-    Вес новый: {temp_data.get('current_weight', 0):.0f} кг
-    Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
-    Разница: {temp_data.get('weight_difference', 0):+.0f} кг"""
+        Вес новый: {temp_data.get('current_weight', 0):.0f} кг
+        Вес предыдущий: {temp_data.get('previous_weight', 0):.0f} кг
+        Разница: {temp_data.get('weight_difference', 0):+.0f} кг
+        """).strip()
         
         photo_url = temp_data.get('photo_url')
         photo_name = None
