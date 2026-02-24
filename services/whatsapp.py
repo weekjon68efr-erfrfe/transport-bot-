@@ -2,7 +2,6 @@
 WhatsApp Green API client
 """
 import requests
-import re
 from typing import Optional, Dict, Any
 from tenacity import retry, stop_after_attempt, wait_exponential
 
@@ -136,9 +135,7 @@ class WhatsAppClient:
             sender_data = data.get("senderData", {})
             
             chat_id = sender_data.get("chatId", "")
-            # Normalize phone: take part before @ and keep only digits
-            raw_phone = chat_id.split("@")[0]
-            phone = re.sub(r"\D", "", raw_phone)
+            phone = chat_id.split("@")[0]
             
             # Check message type
             text = None
