@@ -80,7 +80,7 @@ class Messages:
         parts: list[str] = []
 
         # Drivers
-        parts.append("*СТАТИСТИКА: ВОДИТЕЛИ*\n")
+        parts.append("*ВОДИТЕЛИ*\n")
         drivers = stats.get('by_driver') or []
         if drivers:
             for i, d in enumerate(drivers, start=1):
@@ -88,31 +88,31 @@ class Messages:
                 phone = d.get('driver_phone') or ''
                 cnt = d.get('count', 0)
                 total = d.get('total', 0)
-                parts.append(f"*{name}* {phone}:\n({i}) Отчётов: {cnt}. Суммарно {total:.0f} кг\n")
+                parts.append(f"*{name}* {phone}:\nОтчётов: {cnt}. Суммарно {total:.0f} кг\n")
         else:
             parts.append("Нет данных по водителям.\n")
 
         # Trucks
-        parts.append("*СТАТИСТИКА: МАШИНЫ*\n")
+        parts.append("*МАШИНЫ*\n")
         trucks = stats.get('by_truck') or []
         if trucks:
             for i, t in enumerate(trucks, start=1):
                 truck = t.get('truck_number') or ''
                 cnt = t.get('count', 0)
                 total = t.get('total', 0)
-                parts.append(f"{truck}:\n({i}) Отчётов: {cnt}. Суммарно {total:.0f} кг\n")
+                parts.append(f"{truck}:\nОтчётов: {cnt}. Суммарно {total:.0f} кг\n")
         else:
             parts.append("Нет данных по машинам.\n")
 
         # Clients
-        parts.append("*СТАТИСТИКА: КЛИЕНТЫ*\n")
+        parts.append("*КЛИЕНТЫ*\n")
         clients = stats.get('by_client') or []
         if clients:
             for i, c in enumerate(clients, start=1):
                 client = c.get('client_name') or 'Неизвестный'
                 cnt = c.get('count', 0)
                 total = c.get('total', 0)
-                parts.append(f"{client}:\n({i}) Отчётов: {cnt}. Суммарно {total:.0f} кг\n")
+                parts.append(f"{client}:\nОтчётов: {cnt}. Суммарно {total:.0f} кг\n")
         else:
             parts.append("Нет данных по клиентам.\n")
 
